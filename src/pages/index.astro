@@ -18,6 +18,7 @@ import m1647492 from "../assets/img/m164-7492.jpg";
 import m7410749 from "../assets/img/m741-0749.jpg";
 import m6892534 from "../assets/img/m689-2534.jpg";
 import { contact, wa, socials, parts, NOTE, STOCK_DATE } from "../data/site";
+import alumniCyr from "../assets/fonts/alumni-sans-cyrillic-wght-normal.woff2?url";
 
 const title = "Вживані вантажівки та спецтехніка в Естонії — KB Auto";
 const description = "Понад 700 вживаних тягачів, вантажівок, автобусів і спецтехніки на майданчику KB Auto в Rummu. Доставка в порт, реєстрація, викуп. Пишіть у WhatsApp.";
@@ -61,7 +62,7 @@ const jsonld = {
 ---
 <Base lang="uk" title={title} description={description} seoRec="R-SEO-12">
   <Fragment slot="head">
-    <link rel="preload" href="/fonts/alumni-sans-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin data-rec="R-SP-05" />
+    <link rel="preload" href={alumniCyr} as="font" type="font/woff2" crossorigin data-rec="R-SP-05" />
     <script type="application/ld+json" data-rec="R-SEO-13" set:html={JSON.stringify(jsonld)} />
   </Fragment>
   <Header slot="header" />
