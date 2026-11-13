@@ -1,0 +1,330 @@
+---
+// KB Auto homepage (VEON DEMO). Design: design/concept.md; scenarios: ux/demo-home.md; facts: veon/client.json.
+import { Picture } from "astro:assets";
+import Base from "../layouts/Base.astro";
+import Section from "../components/Section.astro";
+import Header from "../components/Header.astro";
+import Icon from "../components/Icon.astro";
+import "../styles/site.css";
+import "../styles/sections.css";
+import YardPlan from "../components/YardPlan.astro";
+import FutureLink from "../components/FutureLink.astro";
+import yard from "../assets/img/yard.jpg";
+import logo from "../assets/img/logo-main.svg";
+import m0081869 from "../assets/img/m008-1869.jpg";
+import m3528286 from "../assets/img/m352-8286.jpg";
+import m1120166 from "../assets/img/m112-0166.jpg";
+import m1647492 from "../assets/img/m164-7492.jpg";
+import m7410749 from "../assets/img/m741-0749.jpg";
+import m6892534 from "../assets/img/m689-2534.jpg";
+import { contact, wa, socials, parts, NOTE, STOCK_DATE } from "../data/site";
+
+const title = "Вживані вантажівки та спецтехніка в Естонії — KB Auto";
+const description = "Понад 700 вживаних тягачів, вантажівок, автобусів і спецтехніки на майданчику KB Auto в Rummu. Доставка в порт, реєстрація, викуп. Пишіть у WhatsApp.";
+
+// Stock snapshot from the current homepage on 13.11.2026 (design/concept.md, «Изображения клиента»); prices excl. VAT.
+const stock = [
+  { id: "M008-1869", model: "Scania R 580 6x2", year: 2015, km: "1 233 805 км", price: "24 500", img: m0081869, alt: "Чорний тягач Scania R 580 6x2 перед помаранчевим фасадом KB Auto" },
+  { id: "M352-8286", model: "Mercedes-Benz Antos 1830 4x2", year: 2015, km: "137 674 км", price: "28 900", img: m3528286, alt: "Вантажівка Mercedes-Benz Antos 1830 4x2 на майданчику KB Auto" },
+  { id: "M112-0166", model: "MAN TGS 28.480 6x4*4", year: 2008, km: "229 885 км", price: "39 500", img: m1120166, alt: "Вантажівка MAN TGS 28.480 6x4*4 на майданчику KB Auto" },
+  { id: "M164-7492", model: "Krone SDR27", year: 2016, km: null, price: "16 900", img: m1647492, alt: "Напівпричіп Krone SDR27 на майданчику KB Auto" },
+];
+const [lead, ...rest] = stock;
+const rent = [
+  { id: "M741-0749", model: "DAF XG 530 6x2", year: 2022, price: "2 105", per: "EUR на місяць", img: m7410749, alt: "Тягач DAF XG 530 6x2 2022 року, доступний в оренду" },
+  { id: "M689-2534", model: "Scania P 220 4x2", year: 2019, price: "995", per: "EUR на тиждень", img: m6892534, alt: "Вантажівка Scania P 220 4x2 2019 року, доступна в оренду" },
+];
+const askStock = (m: { model: string; id: string }) => wa(`Добрий день! Цікавить ${m.model}, ID ${m.id}`);
+const askRent = (m: { model: string; id: string }) => wa(`Добрий день! Цікавить оренда ${m.model}, ID ${m.id}`);
+const sellText = wa("Добрий день! Хочу продати техніку: марка, модель, рік, пробіг, місто.");
+
+// JSON-LD (concept.md «SEO главной»). Opening hours: the Rummu sales location; reconcile with the client (R-UX-08).
+const address = { "@type": "PostalAddress", streetAddress: "Kooli 10", addressLocality: "Rummu alevik", addressRegion: "Harjumaa", postalCode: "76102", addressCountry: "EE" };
+const jsonld = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "AutoDealer", "@id": "#rummu", name: "KB Auto", legalName: "KB Auto Eesti OÜ", vatID: "EE101185688", foundingDate: "2007",
+      address, telephone: "+37256804201", email: "sales@kbauto.ee", logo: logo.src, image: yard.src,
+      openingHoursSpecification: [{ "@type": "OpeningHoursSpecification", dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], opens: "09:00", closes: "17:00" }],
+      sameAs: socials.map((s) => s.href), parentOrganization: { "@id": "#group" },
+    },
+    {
+      "@type": "AutoDealer", "@id": "#vihti", name: "KB Auto, Vihti", telephone: "+358404834737", email: "myynti@kbauto.fi",
+      address: { "@type": "PostalAddress", streetAddress: "Tervasuontie 5", addressLocality: "Vihti", postalCode: "03100", addressCountry: "FI" },
+      parentOrganization: { "@id": "#group" },
+    },
+    { "@type": "Organization", "@id": "#group", name: "KB Auto Group", subOrganization: [{ "@id": "#rummu" }, { "@id": "#vihti" }], sameAs: socials.map((s) => s.href) },
+    { "@type": "WebSite", name: "KB Auto", inLanguage: "uk" },
+  ],
+};
+---
+<Base lang="uk" title={title} description={description} seoRec="R-SEO-12">
+  <Fragment slot="head">
+    <link rel="preload" href="/fonts/alumni-sans-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin data-rec="R-SP-05" />
+    <script type="application/ld+json" data-rec="R-SEO-13" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
+  <Header slot="header" />
+
+  <Section id="hero" rec="R-UX-03" class="hero">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <h1 class="hero__title" data-rec="R-SEO-11">Вживані вантажівки, автобуси та спецтехніка з майданчика в Rummu</h1>
+        <p class="hero__lead">У каталозі 803 оголошення в 14 категоріях станом на 13.11.2026: техніка й запчастини, усі ціни без ПДВ.</p>
+        <div class="hero__actions" data-rec="R-UX-02">
+          <a class="btn btn--primary btn--lg" href={wa("Добрий день! Шукаю техніку, підкажіть, будь ласка.")} target="_blank" rel="noopener">
+            <Icon name="whatsapp" class="btn__icon" />
+            <span>Написати в WhatsApp</span>
+          </a>
+          <a class="btn btn--ghost btn--lg" href="#catalog">
+            <span>Обрати техніку</span>
+            <Icon name="down" size={18} />
+          </a>
+          <a class="hero__phone" href={contact.phone.href}><Icon name="phone" size={18} /><span>{contact.phone.label}</span></a>
+        </div>
+      </div>
+      <figure class="hero__count">
+        <span class="hero__num">700+</span>
+        <figcaption class="hero__caption">одиниць техніки стоїть на майданчику в Rummu. Продаємо з 2007 року.</figcaption>
+      </figure>
+      <figure class="hero__pano" data-rec="R-UX-12,R-SP-01,R-SP-04">
+        <Picture
+          src={yard}
+          formats={["avif", "webp"]}
+          widths={[640, 960, 1312, 1600]}
+          sizes="(max-width: 767px) 640px, (min-width: 1440px) 1312px, 92vw"
+          width={1600}
+          height={400}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          alt="Майданчик KB Auto в Rummu: ряди вантажівок і тягачів перед будівлею з написом KBAUTO"
+        />
+      </figure>
+    </div>
+  </Section>
+
+  <Section id="catalog" class="catalog">
+    <div class="container">
+      <div class="section-head">
+        <h2>План двору</h2>
+        <p class="section-head__text">Що стоїть у Rummu зараз: 803 оголошення в 14 категоріях станом на {STOCK_DATE}. Чим більша ділянка, тим більше техніки цього типу.</p>
+      </div>
+      <YardPlan />
+      <div class="parts">
+        <h3 class="parts__title">Запчастини</h3>
+        <ul class="parts__list">
+          {parts.map((p) => (
+            <li><FutureLink note={NOTE} class="parts__item"><span class="num parts__num">{p.count}</span><span>{p.name}</span></FutureLink></li>
+          ))}
+        </ul>
+        <FutureLink note={NOTE} class="parts__all">Увесь каталог</FutureLink>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="stock" rec="R-UX-04" class="stock">
+    <div class="container">
+      <div class="section-head section-head--row">
+        <h2>Щойно на майданчику</h2>
+        <p class="section-head__text muted">Ціни без ПДВ, станом на {STOCK_DATE}.</p>
+      </div>
+      <div class="stock__grid">
+        <article class="car car--lead">
+          <div class="car__photo" data-rec="R-SP-01,R-SP-04">
+            <Picture src={lead.img} formats={["avif", "webp"]} widths={[400, 640, 800]} sizes="(min-width: 1440px) 800px, (min-width: 1024px) 56vw, 92vw" width={800} height={600} loading="lazy" decoding="async" alt={lead.alt} />
+          </div>
+          <div class="car__body">
+            <h3 class="car__model">{lead.model}</h3>
+            <p class="car__tag">Нове надходження</p>
+            <dl class="car__specs">
+              <div><dt>Рік</dt><dd>{lead.year}</dd></div>
+              <div><dt>Пробіг</dt><dd>{lead.km}</dd></div>
+              <div><dt>ID</dt><dd>{lead.id}</dd></div>
+            </dl>
+            <p class="car__price"><span class="num">{lead.price} EUR</span> <span class="car__vat">без ПДВ</span></p>
+            <div class="car__actions">
+              <a class="btn btn--primary" data-rec="S-R010" href={askStock(lead)} target="_blank" rel="noopener"><Icon name="whatsapp" class="btn__icon" /><span>Запитати у WhatsApp</span></a>
+              <FutureLink note={NOTE} class="car__more">Усі фото й характеристики</FutureLink>
+            </div>
+          </div>
+        </article>
+        <ul class="stock__list">
+          {rest.map((m) => (
+            <li>
+              <article class="car car--row">
+                <div class="car__photo" data-rec="R-SP-01,R-SP-04">
+                  <Picture src={m.img} formats={["avif", "webp"]} widths={[240, 360, 480]} sizes="(min-width: 1024px) 168px, 136px" width={800} height={600} loading="lazy" decoding="async" alt={m.alt} />
+                </div>
+                <div class="car__body">
+                  <h3 class="car__model">{m.model}</h3>
+                  <dl class="car__specs">
+                    <div><dt>Рік</dt><dd>{m.year}</dd></div>
+                    {m.km && <div><dt>Пробіг</dt><dd>{m.km}</dd></div>}
+                    <div><dt>ID</dt><dd>{m.id}</dd></div>
+                  </dl>
+                  <p class="car__price"><span class="num">{m.price} EUR</span> <span class="car__vat">без ПДВ</span></p>
+                  <a class="car__ask" data-rec="S-R010" href={askStock(m)} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} class="btn__icon" /><span>Запитати у WhatsApp</span></a>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="services" rec="R-UX-14" class="services">
+    <div class="container services__grid">
+      <div class="services__head">
+        <h2>Доставка й оформлення</h2>
+        <p class="section-head__text">Від нашого майданчика до порту і з номерами. Ціни без ПДВ.</p>
+      </div>
+      <div class="route" data-reveal>
+        <h3 class="services__sub">Доставка з Rummu</h3>
+        <ol class="route__line">
+          <li class="route__stop route__stop--start"><span class="route__place">Rummu, майданчик KB Auto</span></li>
+          <li class="route__stop"><span class="route__place">Порт Paldiski</span><span class="route__price num">150 €</span></li>
+          <li class="route__stop"><span class="route__place">Tallinn, D-terminal</span><span class="route__price num">200 €</span></li>
+        </ol>
+        <p class="route__km">По Естонії <span class="num">1,85 €</span> за кілометр</p>
+      </div>
+      <div class="paper">
+        <h3 class="services__sub">Оформлення</h3>
+        <ul class="paper__list">
+          <li><span>Реєстрація в Естонії</span><span class="num">950 €</span></li>
+          <li><span>Техогляд на місцевому пункті TÜV</span><span class="num">200 €</span></li>
+          <li><span>Огляд у сертифікованого дилера</span><span class="paper__ask">ціна за запитом</span></li>
+        </ul>
+        <a class="link services__ask" href={wa("Добрий день! Питання щодо доставки й реєстрації техніки.")} target="_blank" rel="noopener">Запитати у WhatsApp</a>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="rent" class="rent">
+    <div class="container rent__grid">
+      <div class="rent__head">
+        <h2>Оренда</h2>
+        <p class="section-head__text">Вантажівки, автобуси, причепи й техніка на місяць або тиждень.</p>
+        <FutureLink note={NOTE} class="rent__all">Уся оренда: 15 машин</FutureLink>
+      </div>
+      <ul class="rent__list">
+        {rent.map((m) => (
+          <li>
+            <article class="lease">
+              <div class="lease__photo" data-rec="R-SP-01,R-SP-04">
+                <Picture src={m.img} formats={["avif", "webp"]} widths={[320, 480, 640]} sizes="(min-width: 1024px) 300px, (min-width: 600px) 44vw, 92vw" width={800} height={600} loading="lazy" decoding="async" alt={m.alt} />
+              </div>
+              <h3 class="lease__model">{m.model}, {m.year}</h3>
+              <p class="lease__price"><span class="num">{m.price}</span> <span>{m.per}</span></p>
+              <a class="car__ask" href={askRent(m)} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} class="btn__icon" /><span>Запитати про оренду</span></a>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </Section>
+
+  <Section id="sell" class="sell">
+    <div class="sell__stripe" data-reveal aria-hidden="true"></div>
+    <div class="container sell__inner">
+      <h2 class="sell__title">Продати техніку</h2>
+      <ul class="sell__ways">
+        <li><h3>Викуп</h3><p>Купуємо вашу машину напряму.</p></li>
+        <li><h3>Комісійний продаж</h3><p>Продаємо від вашого імені на 12 міжнародних платформах.</p></li>
+        <li><h3>Аукціон KB Auctions</h3><p>Торги на аукціоні нашої групи, колишній Bronline. <FutureLink note={NOTE} class="sell__auction">Про аукціони</FutureLink></p></li>
+      </ul>
+      <div class="sell__steps">
+        <h3 class="sell__sub">Комісія в чотири кроки</h3>
+        <ol>
+          <li>Аналіз ринку й ціна</li>
+          <li>Технічний огляд</li>
+          <li>Професійні фото й відео</li>
+          <li>Активний продаж на 12 платформах</li>
+        </ol>
+        <p class="sell__note">Документи беремо на себе. Відповідаємо протягом одного робочого дня.</p>
+      </div>
+      <div class="sell__actions">
+        <a class="btn btn--ink btn--lg" href={sellText} target="_blank" rel="noopener"><Icon name="whatsapp" class="btn__icon" /><span>Написати про свою техніку</span></a>
+        <a class="sell__mail" href={`mailto:${contact.info}?subject=${encodeURIComponent("Продаж техніки")}`}><Icon name="mail" size={18} /><span>{contact.info}</span></a>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="about" class="about">
+    <div class="container about__grid">
+      <h2 class="about__title">KB Auto з 2007 року</h2>
+      <div class="about__body" data-rec="R-UX-13">
+        <p class="about__lead">Один із найбільших дилерів вживаної важкої техніки в Скандинавії.</p>
+        <ul class="facts">
+          <li><span class="facts__big">Понад 1 700</span><span>одиниць техніки продали у 2023 році по всьому світу.</span></li>
+          <li><span class="facts__big">Чотири країни</span><span>Філії в Естонії, Фінляндії, Швеції та Норвегії.</span></li>
+          <li><span class="facts__big">Топ-3</span><span>автодилерів Естонії 2025 року за версією Trade Congress (Äripäev).</span></li>
+          <li><span class="facts__big">27 людей</span><span>у команді: продаж, запчастини, закупівля, логістика.</span></li>
+        </ul>
+      </div>
+      <div class="group" data-rec="R-UX-10">
+        <h3 class="group__title">Група KB Auto</h3>
+        <ul class="group__list">
+          <li>KB Auctions</li><li>KB Rent</li><li>KB Auto Parts</li><li>KB Auto Finland</li><li>KB Auto Sverige</li>
+          <li>Rummu Invest</li>
+        </ul>
+        <p class="group__rep muted">Офіційний представник Ford Trucks в Естонії, HIDROMEK і McCauley Trailers.</p>
+      </div>
+    </div>
+  </Section>
+
+  <Section id="contacts" class="contacts on-dark">
+    <div class="container">
+      <h2 class="contacts__title">Контакти</h2>
+      <ul class="channels">
+        <li><a class="btn btn--primary btn--lg" href={wa()} target="_blank" rel="noopener"><Icon name="whatsapp" class="btn__icon" /><span>WhatsApp</span></a></li>
+        <li><a class="channel" href={contact.phone.href}><Icon name="phone" /><span>{contact.phone.label}</span></a></li>
+        <li><a class="channel" href={`mailto:${contact.sales}`}><Icon name="mail" /><span>{contact.sales}</span><span class="channel__note">продаж</span></a></li>
+        <li><a class="channel" href={`mailto:${contact.info}`}><Icon name="mail" /><span>{contact.info}</span><span class="channel__note">загальні питання</span></a></li>
+      </ul>
+      <div class="places">
+        <div class="place place--main">
+          <h3>Rummu, Естонія</h3>
+          <address>Kooli 10, Rummu alevik, 76102<br />Lääne-Harju vald, Harjumaa</address>
+          <dl class="hours">
+            <div><dt>Офіс</dt><dd>Пн–Пт 08:00–17:00</dd></div>
+            <div><dt>Майданчик</dt><dd>Пн–Пт 09:00–17:00 або за домовленістю</dd></div>
+          </dl>
+          <a class="place__map" href={contact.map} target="_blank" rel="noopener"><Icon name="pin" /><span>Маршрут на карті</span></a>
+        </div>
+        <div class="place">
+          <h3>Vihti, Фінляндія</h3>
+          <address>Tervasuontie 5, 03100 Vihti</address>
+          <p class="place__by">Працює за домовленістю</p>
+          <ul class="place__links">
+            <li><a href={contact.phoneFi.href}><Icon name="phone" size={18} /><span>{contact.phoneFi.label}</span></a></li>
+            <li><a href={`mailto:${contact.fi}`}><Icon name="mail" size={18} /><span>{contact.fi}</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <footer slot="footer" class="site-footer on-dark">
+    <div class="container site-footer__grid">
+      <a class="site-footer__logo" href="#top" aria-label="KB Auto, на початок сторінки"><img src={logo.src} width="226" height="37" alt="KB Auto" /></a>
+      <p class="site-footer__legal">KB Auto Eesti OÜ<br />Реєстраційний код 11430778<br />VAT EE101185688</p>
+      <ul class="site-footer__social" aria-label="Соцмережі" data-rec="S-R009">
+        {socials.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.name}</a></li>)}
+      </ul>
+      <ul class="site-footer__pages">
+        <li><FutureLink note={NOTE}>Новини</FutureLink></li>
+        <li><FutureLink note={NOTE}>Умови</FutureLink></li>
+        <li><FutureLink note={NOTE}>Політика конфіденційності</FutureLink></li>
+        <li><FutureLink note={NOTE}>Cookies</FutureLink></li>
+      </ul>
+      <p class="site-footer__copy">© 2026 KB Auto Eesti OÜ</p>
+    </div>
+  </footer>
+
+  <nav slot="footer" class="mobile-bar" aria-label="Швидкий зв’язок" data-rec="R-UX-02,R-UX-11">
+    <a class="mobile-bar__wa" href={wa()} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>WhatsApp</span></a>
+    <a class="mobile-bar__call" href={contact.phone.href}><Icon name="phone" /><span>Подзвонити</span></a>
+  </nav>
+</Base>

@@ -1,0 +1,79 @@
+---
+import FutureLink from "./FutureLink.astro";
+import Icon from "./Icon.astro";
+import logo from "../assets/img/logo-main.svg";
+import { nav, contact, wa, languages, NOTE } from "../data/site";
+---
+<header class="site-header" data-rec="R-UX-02,MA-R003">
+  <div class="container site-header__row">
+    <a class="site-header__logo" href="#top" aria-label="KB Auto, на початок сторінки">
+      <img src={logo.src} width="226" height="37" alt="KB Auto" />
+    </a>
+
+    <nav class="site-nav" aria-label="Розділи сторінки">
+      <ul>
+        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="site-header__phone" href={contact.phone.href}>
+        <Icon name="phone" size={18} />
+        <span>{contact.phone.label}</span>
+      </a>
+      <a class="btn btn--primary btn--header" href={wa()} target="_blank" rel="noopener">
+        <Icon name="whatsapp" class="btn__icon" />
+        <span class="btn__label">Написати<span class="btn__extra"> у WhatsApp</span></span>
+      </a>
+
+      <details class="lang">
+        <summary aria-label="Мова сторінки: українська. Інші мови">УКР</summary>
+        <ul class="lang__list">
+          {languages.map((l) => (
+            <li lang={l.code.toLowerCase()} dir={l.code === "AR" ? "rtl" : undefined}>
+              <FutureLink note={NOTE} class="lang__item">{l.name}</FutureLink>
+            </li>
+          ))}
+        </ul>
+      </details>
+
+      <details class="menu">
+        <summary aria-label="Меню"><Icon name="menu" size={24} /></summary>
+        <div class="menu__panel">
+          <nav aria-label="Меню">
+            <ul class="menu__links">
+              {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+            </ul>
+          </nav>
+          <ul class="menu__contacts">
+            <li><a href={contact.phone.href}><Icon name="phone" size={18} />{contact.phone.label}</a></li>
+            <li><a href={`mailto:${contact.sales}`}><Icon name="mail" size={18} />{contact.sales}</a></li>
+          </ul>
+          <ul class="menu__langs" aria-label="Інші мови">
+            {languages.map((l) => (
+              <li lang={l.code.toLowerCase()}><FutureLink note={NOTE} class="lang__item">{l.code}</FutureLink></li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Close the burger and language menus after choosing a link, on Escape and on a click outside.
+  const menus = document.querySelectorAll<HTMLDetailsElement>(".site-header details");
+  const closeAll = (except?: Element) => menus.forEach((d) => { if (d !== except) d.open = false; });
+  menus.forEach((d) => {
+    d.addEventListener("toggle", () => { if (d.open) closeAll(d); });
+    d.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => { d.open = false; }));
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    const open = [...menus].find((d) => d.open);
+    if (open) { open.open = false; open.querySelector("summary")?.focus(); }
+  });
+  document.addEventListener("click", (e) => {
+    if (!(e.target instanceof Element) || !e.target.closest(".site-header details")) closeAll();
+  });
+</script>

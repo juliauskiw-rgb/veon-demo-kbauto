@@ -1,0 +1,68 @@
+---
+// «План двору»: the stock as a site plan. Desktop: a squarified treemap where a plot's area follows the number
+// of listings (C-004); the smallest categories get a minimum plot so their name stays readable.
+// Phone and tablet: rows with bars whose length follows the same number. Every plot is a future catalogue page.
+import FutureLink from "./FutureLink.astro";
+import { categories, NOTE } from "../data/site";
+
+type Rect = { x: number; y: number; w: number; h: number };
+const W = 100, H = 46;          // plan proportions (container ≈ 1312 × 600)
+const MIN = 20;                 // minimum plot, in listings
+const max = Math.max(...categories.map((c) => c.count));
+const items = [...categories].sort((a, b) => b.count - a.count);
+const weights = items.map((c) => Math.max(c.count, MIN));
+const total = weights.reduce((a, b) => a + b, 0);
+const areas = weights.map((v) => (v / total) * W * H);
+
+const worst = (row: number[], side: number) => {
+  const s = row.reduce((a, b) => a + b, 0);
+  return Math.max(...row.map((r) => Math.max((side * side * r) / (s * s), (s * s) / (side * side * r))));
+};
+function squarify(list: number[], frame: Rect): Rect[] {
+  const out: Rect[] = [];
+  let r = { ...frame };
+  let i = 0;
+  while (i < list.length) {
+    const side = Math.min(r.w, r.h);
+    const row = [list[i]];
+    let j = i + 1;
+    while (j < list.length && worst([...row, list[j]], side) <= worst(row, side)) { row.push(list[j]); j++; }
+    const s = row.reduce((a, b) => a + b, 0);
+    if (r.w >= r.h) {
+      const cw = s / r.h; let y = r.y;
+      for (const a of row) { const h = a / cw; out.push({ x: r.x, y, w: cw, h }); y += h; }
+      r = { x: r.x + cw, y: r.y, w: r.w - cw, h: r.h };
+    } else {
+      const rh = s / r.w; let x = r.x;
+      for (const a of row) { const w = a / rh; out.push({ x, y: r.y, w, h: rh }); x += w; }
+      r = { x: r.x, y: r.y + rh, w: r.w, h: r.h - rh };
+    }
+    i = j;
+  }
+  return out;
+}
+const rects = squarify(areas, { x: 0, y: 0, w: W, h: H });
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
+const plots = items.map((c, i) => {
+  const r = rects[i];
+  // number size grows with the plot: square root of its area, in container-width units
+  const k = Math.min(11, Math.max(2.6, Math.sqrt(r.w * r.h) * 0.42));
+  return {
+    ...c,
+    style: `--x:${pct(r.x, W)};--y:${pct(r.y, H)};--w:${pct(r.w, W)};--h:${pct(r.h, H)};--k:${k.toFixed(2)};--i:${i};--r:${(c.count / max).toFixed(4)}`,
+  };
+});
+---
+<div class="plan" data-reveal>
+  <ul class="plan__grid">
+    {plots.map((p) => (
+      <li class="plan__plot" style={p.style}>
+        <FutureLink note={NOTE} class="plan__cell">
+          <span class="plan__num num">{p.count}</span>
+          <span class="plan__name">{p.name}</span>
+          <span class="plan__bar" aria-hidden="true"></span>
+        </FutureLink>
+      </li>
+    ))}
+  </ul>
+</div>
